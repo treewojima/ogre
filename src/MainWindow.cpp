@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 
-MainWindow::MainWindow() : OgreBites::ApplicationInstance("OgreApp")
+MainWindow::MainWindow() : OgreBites::ApplicationContext("OgreApp")
 {
 }
 
@@ -26,7 +26,7 @@ void MainWindow::setup()
 	cam->setAutoAspectRatio(true);
 	camNode->attachObject(cam);
 
-	getRenderWindow()->addViewpoint(cam);
+	getRenderWindow()->addViewport(cam);
 
 	auto node = scnMgr->getRootSceneNode()->createChildSceneNode();
 	node->scale(0.25, 0.25, 0.25);

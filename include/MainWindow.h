@@ -2,7 +2,7 @@
 #define __OGRE_MAINWINDOW_H__
 
 #include <Ogre.h>
-#include <OgreBites.h>
+#include <OgreApplicationContext.h>
 
 class MainWindow : public OgreBites::ApplicationContext, 
 				   public OgreBites::InputListener
@@ -10,7 +10,7 @@ class MainWindow : public OgreBites::ApplicationContext,
 public:
 	MainWindow();
 	void setup() override;
-	bool keyPressed(const OgreBytes::KeyboardEvent &e) override;
+	bool keyPressed(const OgreBites::KeyboardEvent &e) override;
 };
 
 #endif
