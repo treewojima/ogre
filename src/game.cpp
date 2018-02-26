@@ -19,6 +19,7 @@
 
 #include <OgreConfigFile.h>
 #include <OgreException.h>
+#include <iostream>
 #include <sstream>
 
 #include "logger.h"
@@ -32,7 +33,7 @@ Game::Game(const Options &options) :
 	_resourcesCfg(Ogre::BLANKSTRING),
 	_pluginsCfg(Ogre::BLANKSTRING)
 {
-    Logger::init(options.logFile);
+    Logger::init(options.logFile, options.suppressOgreLog);
 }
 
 void Game::run()
@@ -45,6 +46,9 @@ void Game::run()
 
     _window = new Window();
     _inputMgr = new InputManager();
+    
+    //_root->startRendering();
+    std::cin.get();
     
     delete _inputMgr;
     delete _window;
@@ -84,7 +88,7 @@ void Game::parseOgreConfig()
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(name, type);
 	}
     
-    if (!_root->restoreConfig()) _root->showConfigDialog();
+    if (!_root->restoreConfig()) _root->showConfigDialog(nullptr);
 }
 
 bool Game::frameRenderingQueued(const Ogre::FrameEvent &e)

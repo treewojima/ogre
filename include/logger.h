@@ -53,7 +53,7 @@ namespace Logger
     }
 
     // Init/shutdown
-    void init(const std::string &logFile);
+    void init(const std::string &logFile, bool suppressOgreLog);
     void destroy();
 
     // Predicate that checks if an object is flagged as "do not log"
@@ -77,15 +77,17 @@ namespace Logger
 
 BOOST_LOG_GLOBAL_LOGGER(gLog, boost::log::sources::severity_logger_mt<Logger::SeverityType>)
 
-#define LOG_PLAIN   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Plain)
-#define LOG_DEBUG   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Debug)
-#define LOG_INFO    BOOST_LOG_SEV(gLog::get(), Logger::Severity::Info)
-#define LOG_WARNING BOOST_LOG_SEV(gLog::get(), Logger::Severity::Warning)
-#define LOG_ERROR   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Error)
+#define LOG_BASE(s) BOOST_LOG_SEV(gLog::get(), s)
 
-#define LOG_OGRE_TRIVIAL  BOOST_LOG_SEV(gLog::get(), Logger::Severity::Ogre::Trivial)
-#define LOG_OGRE_NORMAL   BOOST_LOG_SEV(gLog::get(), Logger::Severity::Ogre::Normal)
-#define LOG_OGRE_WARNING  BOOST_LOG_SEV(gLog::get(), Logger::Severity::Ogre::Warning)
-#define LOG_OGRE_CRITICAL BOOST_LOG_SEV(gLog::get(), Logger::Severity::Ogre::Critical)
+#define LOG_PLAIN   LOG_BASE(Logger::Severity::Plain)
+#define LOG_DEBUG   LOG_BASE(Logger::Severity::Debug)
+#define LOG_INFO    LOG_BASE(Logger::Severity::Info)
+#define LOG_WARNING LOG_BASE(Logger::Severity::Warning)
+#define LOG_ERROR   LOG_BASE(Logger::Severity::Error)
+
+#define LOG_OGRE_TRIVIAL  LOG_BASE(Logger::Severity::Ogre::Trivial)
+#define LOG_OGRE_NORMAL   LOG_BASE(Logger::Severity::Ogre::Normal)
+#define LOG_OGRE_WARNING  LOG_BASE(Logger::Severity::Ogre::Warning)
+#define LOG_OGRE_CRITICAL LOG_BASE(Logger::Severity::Ogre::Critical)
 
 #endif

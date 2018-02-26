@@ -25,7 +25,6 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/utility/setup.hpp>
-//#include <boost/utility/empty_deleter.hpp>
 #include <fstream>
 #include <iostream>
 #include <OgreLogManager.h>
@@ -37,6 +36,7 @@ namespace src = bl::sources;
 
 namespace
 {
+    bool _suppressOgreLog;
     void initOgreLog();
     Logger::OgreLogListener *getLogListener();
 }
@@ -69,8 +69,8 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(gLog, src::severity_logger_mt<Logger::SeverityType>
     return lg;
 }
 
-void Logger::init(const std::string &logFile)
-{
+void Logger::init(const std::string &logFile, bool suppressOgreLog)
+{    
     bl::core::get()->add_global_attribute("TimeStamp", attr::local_clock());
     
     typedef bl::sinks::synchronous_sink<bl::sinks::text_ostream_backend> text_sink;
@@ -102,6 +102,7 @@ void Logger::init(const std::string &logFile)
 
     bl::core::get()->add_sink(sink);
     
+    _suppressOgreLog = suppressOgreLog;
     initOgreLog();
 }
 
@@ -118,27 +119,32 @@ void Logger::OgreLogListener::messageLogged(
     const Ogre::String &logName,
     bool &skipThisMessage)
 {
-    switch (lml)
+    if (!_suppressOgreLog)
     {
-    case Ogre::LML_TRIVIAL:
-        LOG_OGRE_TRIVIAL << message;
-        break;
-        
-    case Ogre::LML_NORMAL:
-        LOG_OGRE_NORMAL << message;
-        break;
-        
-    case Ogre::LML_WARNING:
-        LOG_OGRE_WARNING << message;
-        break;
-        
-    case Ogre::LML_CRITICAL:
-        LOG_OGRE_CRITICAL << message;
-        break;
-        
-    default:
-        LOG_WARNING << "Unknown OGRE log message: " << message;
+        switch (lml)
+        {
+        case Ogre::LML_TRIVIAL:
+            LOG_OGRE_TRIVIAL << message;
+            break;
+            
+        case Ogre::LML_NORMAL:
+            LOG_OGRE_NORMAL << message;
+            break;
+            
+        case Ogre::LML_WARNING:
+            LOG_OGRE_WARNING << message;
+            break;
+            
+        case Ogre::LML_CRITICAL:
+            LOG_OGRE_CRITICAL << message;
+            break;
+            
+        default:
+            LOG_WARNING << "Unknown OGRE log message: " << message;
+        }
     }
+    
+    skipThisMessage = true;
 }
 
 namespace {
@@ -147,7 +153,7 @@ void initOgreLog()
 {
     // First, create a LogManager and custom log, suppressing file output
     auto logMgr = new Ogre::LogManager();
-    logMgr->setLogDetail(Ogre::LL_NORMAL);
+    logMgr->setLogDetail(Ogre::LL_BOREME);
     auto log = logMgr->createLog("ogre.log", true, true, true);
     
     // Next, create the custom listener to act as a sink for OGRE messages

@@ -10,8 +10,8 @@ InputManager::InputManager() :
         _keyboard(nullptr),
         _mouse(nullptr)
 {
-    auto window = getGame().getWindow();
-    auto renderWindow = window._renderWindow;
+    auto window = getGame()->getWindow();
+    auto renderWindow = window->_renderWindow;
     size_t hwnd = 0;
     renderWindow->getCustomAttribute("WINDOW", &hwnd);
     
@@ -26,14 +26,16 @@ InputManager::InputManager() :
     _mouse = static_cast<OIS::Mouse *>(
         _inputMgr->createInputObject(OIS::OISMouse, false));
         
-    window.windowResized(renderWindow);
     Ogre::WindowEventUtilities::addWindowEventListener(renderWindow, this);
+    window->windowResized(renderWindow);
+    
+    LOG_DEBUG << "created InputManager";
 }
 
 InputManager::~InputManager()
 {
     shutdown();    
-    LOG_DEBUG << "InputManager destroyed";
+    LOG_DEBUG << "destroyed InputManager";
 }
 
 void InputManager::shutdown()
@@ -53,20 +55,20 @@ void InputManager::windowResized(Ogre::RenderWindow *renderWindow)
     unsigned width, height, depth;
     
     renderWindow->getMetrics(width, height, depth, left, top);
-    auto state = getGame().getInputMgr().getMouseState();
+    auto state = getGame()->getInputMgr()->getMouseState();
     state.width = width;
     state.height = height;
 }
 
 void InputManager::windowClosed(Ogre::RenderWindow *renderWindow)
 {
-    if (renderWindow == getGame().getWindow()._renderWindow)
+    if (renderWindow == getGame()->getWindow()->_renderWindow)
         shutdown();
 }
 
 bool InputManager::frameRenderingQueued(const Ogre::FrameEvent &e)
 {
-    if (_window->isClosed()) return false;
+    if (getGame()->getWindow()->isClosed()) return false;
     
     _keyboard->capture();
     _mouse->capture();
@@ -74,3 +76,4 @@ bool InputManager::frameRenderingQueued(const Ogre::FrameEvent &e)
     if (_keyboard->isKeyDown(OIS::KC_ESCAPE)) return false;
     
     return true;
+}

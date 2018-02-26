@@ -34,12 +34,12 @@ namespace
 
     Game::Options parseArgs(int argc, char *argv[]);
 
-    std::unique_ptr<Game> _game;
+    Game *_game;
 }
 
-Game &getGame()
+Game *getGame()
 {
-    return *_game;
+    return _game;
 }
 
 int main(int argc, char *argv[])
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     {
         auto options = parseArgs(argc, argv);
 
-        _game = std::make_unique<Game>(options);
+        _game = new Game(options);
         _game->run();
     }
     catch (std::exception &e)
@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
         LOG_ERROR << "EXCEPTION: " << e.what();
     }
 
+    delete _game;
     LOG_INFO << "shut down cleanly";
     return 0;
 }
@@ -82,7 +83,8 @@ Game::Options parseArgs(int argc, char *argv[])
         ("help", "produce help message")
         ("width,w", po::value<unsigned>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
         ("height,h", po::value<unsigned>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
-        ("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file");
+        ("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file")
+        ("suppress-ogre-log,q", po::bool_switch(&options.suppressOgreLog)->default_value(false), "suppress OGRE log output");
 
     po::variables_map map;
     po::store(po::parse_command_line(argc, argv, desc), map);
@@ -94,7 +96,6 @@ Game::Options parseArgs(int argc, char *argv[])
         std::exit(0);
     }
 
-    return options;
 #else
 #warning "building w/o program options"
     Game::Options options;
@@ -102,8 +103,10 @@ Game::Options parseArgs(int argc, char *argv[])
     options.programName = "tile";
     options.windowHeight = DEFAULT_WINDOW_HEIGHT;
     options.windowWidth = DEFAULT_WINDOW_WIDTH;
-    return options;
+    options.suppressOgreLog = false;
 #endif
+
+    return options;
 }
 
 }

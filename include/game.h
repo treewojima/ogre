@@ -35,6 +35,7 @@ public:
         std::string programName;
         unsigned windowWidth, windowHeight;
         std::string logFile;
+        bool suppressOgreLog;
     };
 
     Game(const Options &options);
@@ -47,8 +48,8 @@ public:
 
     inline const Options &getOptions() const { return _options; }
 	inline Ogre::Root *getOgreRoot() const { return _root; }
-    inline const Window &getWindow() const { return *_window; }
-    inline const InputManager &getInputMgr() const { return *_inputMgr; }
+    inline Window *getWindow() const { return _window; }
+    inline InputManager *getInputMgr() const { return _inputMgr; }
     
     std::string toString() const override { return "Game[]"; }
 
@@ -69,7 +70,7 @@ private:
 };
 
 // Global game instance getter (in main.cpp)
-Game &getGame();
+Game *getGame();
 
 #endif
 

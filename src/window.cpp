@@ -27,14 +27,14 @@ Window::Window(unsigned width,
                const std::string &title) :
     _renderWindow(nullptr)
 {
-    _width = width ? width : getGame().getOptions().windowWidth;
-    _height = height ? height : getGame().getOptions().windowHeight;
-    _title = title.length() ? title : getGame().getOptions().programName;
+    _width = width ? width : getGame()->getOptions().windowWidth;
+    _height = height ? height : getGame()->getOptions().windowHeight;
+    _title = title.length() ? title : getGame()->getOptions().programName;
 
-    _renderWindow = getGame().getOgreRoot()->initialise(true, _title);
+    _renderWindow = getGame()->getOgreRoot()->initialise(true, _title);
     Ogre::WindowEventUtilities::addWindowEventListener(_renderWindow, this);
     
-    LOG_INFO << "created window " << this;
+    LOG_INFO << "created window " << *this;
 }
 
 Window::~Window()

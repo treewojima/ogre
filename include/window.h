@@ -38,7 +38,7 @@ public:
            const std::string &title = "");
     ~Window();
     
-    bool isClosed() { return _renderWindow->isClosed(); }
+    bool isClosed() const { return _renderWindow->isClosed(); }
         
     std::string toString() const override;
     
