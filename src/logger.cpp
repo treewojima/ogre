@@ -43,7 +43,7 @@ namespace
 
 namespace Logger::Severity
 {
-    // It's a bit cludgy to include formatting in the SeverityType strings,
+    // It's a bit kludgy to include formatting in the SeverityType strings,
     // but it works
 
     SeverityType Plain   = " ";
@@ -153,7 +153,7 @@ void initOgreLog()
 {
     // First, create a LogManager and custom log, suppressing file output
     auto logMgr = new Ogre::LogManager();
-    logMgr->setLogDetail(Ogre::LL_BOREME);
+    logMgr->setLogDetail(Ogre::LL_LOW); // LL_NORMAL, LL_BOREME
     auto log = logMgr->createLog("ogre.log", true, true, true);
     
     // Next, create the custom listener to act as a sink for OGRE messages

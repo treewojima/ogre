@@ -84,7 +84,8 @@ Game::Options parseArgs(int argc, char *argv[])
         ("width,w", po::value<unsigned>(&options.windowWidth)->default_value(DEFAULT_WINDOW_WIDTH), "set window width")
         ("height,h", po::value<unsigned>(&options.windowHeight)->default_value(DEFAULT_WINDOW_HEIGHT), "set window height")
         ("log-file", po::value<std::string>(&options.logFile)->default_value(defaultLogFile.str()), "set output log file")
-        ("suppress-ogre-log,q", po::bool_switch(&options.suppressOgreLog)->default_value(false), "suppress OGRE log output");
+        ("suppress-ogre-log,q", po::bool_switch(&options.suppressOgreLog)->default_value(false), "suppress OGRE log output")
+        ("config-dialog,c", po::bool_switch(&options.showConfigDialog)->default_value(false), "always show config dialog");
 
     po::variables_map map;
     po::store(po::parse_command_line(argc, argv, desc), map);
@@ -104,6 +105,7 @@ Game::Options parseArgs(int argc, char *argv[])
     options.windowHeight = DEFAULT_WINDOW_HEIGHT;
     options.windowWidth = DEFAULT_WINDOW_WIDTH;
     options.suppressOgreLog = false;
+    options.showConfigDialog = false;
 #endif
 
     return options;

@@ -25,7 +25,8 @@ InputManager::InputManager() :
         _inputMgr->createInputObject(OIS::OISKeyboard, false));
     _mouse = static_cast<OIS::Mouse *>(
         _inputMgr->createInputObject(OIS::OISMouse, false));
-        
+    
+    getGame()->getOgreRoot()->addFrameListener(this);
     Ogre::WindowEventUtilities::addWindowEventListener(renderWindow, this);
     window->windowResized(renderWindow);
     
@@ -47,6 +48,7 @@ void InputManager::shutdown()
         OIS::InputManager::destroyInputSystem(_inputMgr);
         _inputMgr = nullptr;
     }
+    getGame()->getOgreRoot()->removeFrameListener(this);
 }
 
 void InputManager::windowResized(Ogre::RenderWindow *renderWindow)
@@ -73,6 +75,7 @@ bool InputManager::frameRenderingQueued(const Ogre::FrameEvent &e)
     _keyboard->capture();
     _mouse->capture();
     
+    // NOTE: This should probably be in Game
     if (_keyboard->isKeyDown(OIS::KC_ESCAPE)) return false;
     
     return true;

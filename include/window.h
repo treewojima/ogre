@@ -30,6 +30,7 @@
 class Window : public Stringable,
                public Ogre::WindowEventListener
 {
+    friend class Game;
     friend class InputManager;
     
 public:

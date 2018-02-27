@@ -17,8 +17,14 @@
 
 #include "game.h"
 
+#include <OgreCamera.h>
 #include <OgreConfigFile.h>
+#include <OgreEntity.h>
 #include <OgreException.h>
+#include <OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include <OgreTextureManager.h>
+#include <OgreViewport.h>
 #include <iostream>
 #include <sstream>
 
@@ -42,13 +48,21 @@ void Game::run()
 	_resourcesCfg = "resources.cfg";
 	_pluginsCfg = "plugins.cfg";
 	_root = new Ogre::Root(_pluginsCfg);
-	parseOgreConfig();
+    
+    // Configure our resource directories
+	parseOgreResourcesConfig();
+    
+    // Load main OGRE config, or show the config dialog if none exists
+    //if (_options.showConfigDialog || !_root->restoreConfig())
+        LOG_DEBUG << _root->showConfigDialog();
+    //exit();
 
     _window = new Window();
     _inputMgr = new InputManager();
     
-    //_root->startRendering();
-    std::cin.get();
+    debugSetup();
+    _root->startRendering();
+    //std::cin.get();
     
     delete _inputMgr;
     delete _window;
@@ -73,22 +87,51 @@ void Game::exit(const std::exception *e)
     std::exit(1);
 }
 
-void Game::parseOgreConfig()
+void Game::parseOgreResourcesConfig()
 {
 	Ogre::ConfigFile cf;
 	cf.load(_resourcesCfg);
+    auto sections = cf.getSettingsBySection();
+    for (auto i = sections.begin(); i != sections.end(); ++i)
+    {        
+        for (auto j = i->second.begin(); j != i->second.end(); ++j)
+        {
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(j->second, j->first);
+        }
+    }
+}
 
-	Ogre::String name, type;
-	auto si = cf.getSectionIterator();
-	auto settings = si.getNext();
-	for (auto i = settings->begin(); i != settings->end(); ++i)
-	{
-		type = i->first;
-		name = i->second;
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(name, type);
-	}
+void Game::debugSetup()
+{
+    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
     
-    if (!_root->restoreConfig()) _root->showConfigDialog(nullptr);
+    _sceneMgr = _root->createSceneManager();
+    
+    _camera = _sceneMgr->createCamera("MainCamera");
+    _camera->setNearClipDistance(5);
+    auto cameraNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+    cameraNode->attachObject(_camera);
+    cameraNode->setPosition(0, 0, 80);
+    cameraNode->lookAt(Ogre::Vector3(0, 0, -300), Ogre::SceneNode::TS_WORLD);
+    
+    auto viewport = _window->_renderWindow->addViewport(_camera);
+    viewport->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+    
+    _camera->setAspectRatio(
+        Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));
+    
+    //auto locations = Ogre::ResourceGroupManager::getSingleton().
+    
+    auto entity = _sceneMgr->createEntity("ogrehead.mesh");
+    auto sceneNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+    sceneNode->attachObject(entity);
+    
+    _sceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+    
+    auto lightNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+    lightNode->attachObject(_sceneMgr->createLight("MainLight"));
+    lightNode->setPosition(20, 80, 50);
 }
 
 bool Game::frameRenderingQueued(const Ogre::FrameEvent &e)

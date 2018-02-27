@@ -36,6 +36,7 @@ public:
         unsigned windowWidth, windowHeight;
         std::string logFile;
         bool suppressOgreLog;
+        bool showConfigDialog;
     };
 
     Game(const Options &options);
@@ -64,8 +65,11 @@ private:
 	Ogre::Root *_root;
 	Ogre::String _resourcesCfg;
 	Ogre::String _pluginsCfg;
+    Ogre::SceneManager *_sceneMgr;
+    Ogre::Camera *_camera;
 
-	void parseOgreConfig();
+	void parseOgreResourcesConfig();
+    void debugSetup();
     bool frameRenderingQueued(const Ogre::FrameEvent &e) override;
 };
 

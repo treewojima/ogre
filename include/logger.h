@@ -89,5 +89,7 @@ BOOST_LOG_GLOBAL_LOGGER(gLog, boost::log::sources::severity_logger_mt<Logger::Se
 #define LOG_OGRE_NORMAL   LOG_BASE(Logger::Severity::Ogre::Normal)
 #define LOG_OGRE_WARNING  LOG_BASE(Logger::Severity::Ogre::Warning)
 #define LOG_OGRE_CRITICAL LOG_BASE(Logger::Severity::Ogre::Critical)
+#define LOG_OGRE_INFO     LOG_OGRE_NORMAL
+#define LOG_OGRE_CRITIAL  LOG_OGRE_ERROR
 
 #endif
