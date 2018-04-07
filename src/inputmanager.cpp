@@ -76,7 +76,12 @@ bool InputManager::frameRenderingQueued(const Ogre::FrameEvent &e)
     _mouse->capture();
     
     // NOTE: This should probably be in Game
-    if (_keyboard->isKeyDown(OIS::KC_ESCAPE)) return false;
+    if (_keyboard->isKeyDown(OIS::KC_ESCAPE)) Events::Dispatcher::raise<Events::Quit>();
     
     return true;
+}
+
+std::string Events::KeyDown::toString() const
+{
+    return "lol";
 }

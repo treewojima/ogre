@@ -23,11 +23,15 @@
 #include <OgreFrameListener.h>
 #include <OgreRoot.h>
 
+#include "entitymanager.h"
+#include "events.h"
 #include "inputmanager.h"
 #include "stringable.h"
 #include "window.h"
 
-class Game : public Stringable, public Ogre::FrameListener
+class Game : public Stringable,
+             public Events::Subscriber,
+             public Ogre::FrameListener
 {
 public:
     struct Options
@@ -49,8 +53,12 @@ public:
 
     inline const Options &getOptions() const { return _options; }
 	inline Ogre::Root *getOgreRoot() const { return _root; }
+    inline Ogre::SceneManager *getOgreSceneMgr() { return _sceneMgr; }
     inline Window *getWindow() const { return _window; }
     inline InputManager *getInputMgr() const { return _inputMgr; }
+    inline EntityManager *getEntityMgr() const { return _entityMgr; }
+    
+    void onEvent(const Events::Quit &event);
     
     std::string toString() const override { return "Game[]"; }
 
@@ -60,6 +68,7 @@ private:
     bool _running;
     Window *_window;
     InputManager *_inputMgr;
+    EntityManager *_entityMgr;
 	
 	// OGRE variables
 	Ogre::Root *_root;

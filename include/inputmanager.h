@@ -10,6 +10,8 @@
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
+#include "events.h"
+
 class InputManager : public Ogre::WindowEventListener, public Ogre::FrameListener
 {
     friend class Window;
@@ -31,5 +33,14 @@ private:
     void windowClosed(Ogre::RenderWindow *renderWindow) override;
     bool frameRenderingQueued(const Ogre::FrameEvent &e) override;
 };
+
+namespace Events
+{
+    class KeyDown : public Event
+    {
+    public:
+        std::string toString() const override;
+    };
+}
 
 #endif

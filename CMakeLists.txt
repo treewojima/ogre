@@ -24,18 +24,25 @@ set(OGRE_DIR "C:/Users/SFSVCADV20/Documents/Scott/ogre-build/sdk/CMake")
 find_package(OGRE 1.10 REQUIRED)
 include_directories(${OGRE_INCLUDE_DIRS})
 link_directories(${OGRE_LIBRARY_DIRS})
-file(COPY ${OGRE_CONFIG_DIR}/plugins.cfg ${OGRE_CONFIG_DIR}/resources.cfg
-	DESTINATION ${CMAKE_BINARY_DIR})
+#file(COPY ${OGRE_CONFIG_DIR}/plugins.cfg ${OGRE_CONFIG_DIR}/resources.cfg
+#	DESTINATION ${CMAKE_BINARY_DIR})
 
 set(OIS_INCLUDE_DIR "/mingw64/include/ois")
 include_directories(${OIS_INCLUDE_DIR})
     
 include_directories(${${PROJECT_NAME}_INCLUDE_DIR})
 set(${PROJECT_NAME}_SRC_FILES
+    src/components/camera.cpp
+    src/components/light.cpp
+    src/entity.cpp
+    src/entitymanager.cpp
+    src/events.cpp
     src/game.cpp
     src/inputmanager.cpp
     src/logger.cpp
     src/main.cpp
+    src/scene.cpp
+    src/uuid.cpp
     src/window.cpp)
 
 #get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

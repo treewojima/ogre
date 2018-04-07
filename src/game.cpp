@@ -17,6 +17,7 @@
 
 #include "game.h"
 
+#include <boost/filesystem.hpp>
 #include <OgreCamera.h>
 #include <OgreConfigFile.h>
 #include <OgreEntity.h>
@@ -30,16 +31,20 @@
 
 #include "logger.h"
 
+namespace fs = boost::filesystem;
+
 Game::Game(const Options &options) :
     _options(options),
     _running(false),
     _window(nullptr),
     _inputMgr(nullptr),
+    _entityMgr(nullptr),
 	_root(nullptr),
 	_resourcesCfg(Ogre::BLANKSTRING),
 	_pluginsCfg(Ogre::BLANKSTRING)
 {
     Logger::init(options.logFile, options.suppressOgreLog);
+    Events::Dispatcher::subscribe<Events::Quit>(*this);
 }
 
 void Game::run()
@@ -59,11 +64,13 @@ void Game::run()
 
     _window = new Window();
     _inputMgr = new InputManager();
+    _entityMgr = new EntityManager();
     
     debugSetup();
     _root->startRendering();
     //std::cin.get();
     
+    delete _entityMgr;
     delete _inputMgr;
     delete _window;
 	delete _root;
@@ -87,22 +94,38 @@ void Game::exit(const std::exception *e)
     std::exit(1);
 }
 
-void Game::parseOgreResourcesConfig()
+void Game::onEvent(const Events::Quit &event)
 {
-	Ogre::ConfigFile cf;
-	cf.load(_resourcesCfg);
-    auto sections = cf.getSettingsBySection();
-    for (auto i = sections.begin(); i != sections.end(); ++i)
-    {        
-        for (auto j = i->second.begin(); j != i->second.end(); ++j)
-        {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(j->second, j->first);
-        }
-    }
+    _root->queueEndRendering();
 }
 
+void Game::parseOgreResourcesConfig()
+{
+    auto path = fs::current_path();
+#ifdef _DEBUG
+    // running program from the "build" directory
+    path = path.parent_path();
+#endif
+    path /= "res";
+    LOG_INFO << "scanning " << path.string() << " for resources";
+    
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(path.string(), "FileSystem");
+    auto iter = fs::recursive_directory_iterator(path);
+    for (const auto &entry : iter)
+    {
+        if (fs::is_directory(entry.status()))
+        {
+            //LOG_INFO << "adding directory " << entry.path().string();
+            Ogre::ResourceGroupManager::getSingleton().
+                addResourceLocation(entry.path().string(), "FileSystem");
+        }
+    }
+    std::cin.get();
+}
+    
 void Game::debugSetup()
 {
+#if 0
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
     
@@ -123,15 +146,16 @@ void Game::debugSetup()
     
     //auto locations = Ogre::ResourceGroupManager::getSingleton().
     
-    auto entity = _sceneMgr->createEntity("ogrehead.mesh");
-    auto sceneNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
-    sceneNode->attachObject(entity);
+    //auto entity = _sceneMgr->createEntity("ogrehead.mesh");
+    //auto sceneNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+    //sceneNode->attachObject(entity);
     
     _sceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
     
     auto lightNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
     lightNode->attachObject(_sceneMgr->createLight("MainLight"));
     lightNode->setPosition(20, 80, 50);
+#endif
 }
 
 bool Game::frameRenderingQueued(const Ogre::FrameEvent &e)
